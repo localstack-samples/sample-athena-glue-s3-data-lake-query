@@ -19,111 +19,86 @@ To run this project follow the instructions bellow:
 
 ## 1) Deploy Glue Catalog & Athena Database/Tables
 
-```bash
-#1) Deploy
-aws cloudformation create-stack --stack-name covid-lake-stack --template-url https://covid19-lake.s3.us-east-2.amazonaws.com/cfn/CovidLakeStack.template.json --region us-west-2
-
-#2) Check deployment Status
-aws cloudformation  describe-stacks --stack-name covid-lake-stack --region us-west-2
+Follow these basic steps to deploy the sample on LocalStack:
+```
+$ awslocal s3 mb s3://covid19-lake
+$ awslocal s3 cp CovidLakeStack.template.json s3://covid19-lake/cfn/CovidLakeStack.template.json
+$ awslocal s3 sync ./covid19-lake-data/ s3://covid19-lake/
+$ awslocal cloudformation create-stack --stack-name covid-lake-stack --template-url https://covid19-lake.s3.us-east-2.amazonaws.com/cfn/CovidLakeStack.template.json --region us-west-2
 ```
 
-Below the result of status check, wait for **"StackStatus": "CREATE_COMPLETE"**
+## 2) COVID-19 Analysis
 
-```json
-{
-    "Stacks": [
-        {
-            "StackId": "arn:aws:cloudformation:us-west-2:XXXXXXXX9152:stack/covid-lake-stack/xxxxxxxx-100d-11eb-87ef-xxxxxxxxxxx",
-            "StackName": "covid-lake-stack",
-            "CreationTime": "2020-10-17T00:12:09.151Z",
-            "RollbackConfiguration": {},
-            "StackStatus": "CREATE_COMPLETE",
-            "DisableRollback": false,
-            "NotificationARNs": [],
-            "Tags": [],
-            "EnableTerminationProtection": false,
-            "DriftInformation": {
-                "StackDriftStatus": "NOT_CHECKED"
-            }
-        }
-    ]
-}
+### Running queries in LocalStack
+
+Once the stack has been deployed in LocalStack, you can run queries against the data, for example using the Athena SQL viewer in the LocalStack Web app (https://app.localstack.cloud/resources/athena/sql)
+
+Some example queries are listed below.
+
+To query the list of Moderna vaccine allocations:
+```
+SELECT * FROM covid_19.cdc_moderna_vaccine_distribution
+---
+| jurisdiction | week_of_allocations | first_dose_allocations | second_dose_allocations |
+...
 ```
 
-## 2) Create S3 bucket for Athena Result
-
-```bash
-#1) Deploy S3 Bucket
-aws cloudformation deploy --stack-name athena-results-netcore --template-file ./src/cloud-formation-templates/s3-athena-result.template.yaml --region us-west-2
-
-#2) Check deployment Status
-aws cloudformation  describe-stacks --stack-name athena-results-netcore --region us-west-2
+To query the list of Pfizer vaccine allocations:
+```
+SELECT * FROM covid_19.cdc_pfizer_vaccine_distribution
+---
+| jurisdiction | week_of_allocations | first_dose_allocations | second_dose_allocations |
+...
 ```
 
-Below the result of status check, wait for **"StackStatus": "CREATE_COMPLETE"** and copy output Bucket Name **"OutputValue": "s3://athena-results-netcore-s3bucket-xxxxxxxxxxxx/athena/results/",** you will need this to run your code
-
-```json
-{
-    "Stacks": [
-        {
-            "StackId": "arn:aws:cloudformation:us-west-2:XXXXXXXX9152:stack/athena-results-netcore/xxxxxxxx-100c-11eb-889f-xxxxxxxxxxx",
-            "StackName": "athena-results-netcore",
-            "Description": "Amazon S3 bucket to store Athena query results",
-            "CreationTime": "2020-10-17T00:02:44.968Z",
-            "LastUpdatedTime": "2020-10-17T00:21:13.692Z",
-            "RollbackConfiguration": {
-                "RollbackTriggers": []
-            },
-            "StackStatus": "CREATE_COMPLETE",
-            "DisableRollback": false,
-            "NotificationARNs": [],
-            "Outputs": [
-                {
-                    "OutputKey": "BucketName",
-                    "OutputValue": "s3://athena-results-netcore-s3bucket-xxxxxxxxxxxx/athena/results/",
-                    "Description": "Name of the Amazon S3 bucket to store Athena query results"
-                }
-            ],
-            "Tags": [],
-            "EnableTerminationProtection": false,
-            "DriftInformation": {
-                "StackDriftStatus": "NOT_CHECKED"
-            }
-        }
-    ]
-}
+To query agreggated COVID test data and cases:
+```
+SELECT * FROM covid_19.enigma_aggregation_us_states
+---
+| state_name | date | cases | tests | deaths | ...
+...
 ```
 
-## 3) COVID-19 Analisys (optional)
+To query hospital beds per US state:
+```
+SELECT * FROM covid_19.hospital_beds LIMIT 10
+---
+| state_name | num_licensed_beds | num_icu_beds | bed_utilization | ...
+...
+```
+
+More queries following soon...
+
+### Running queries in AWS
 
 Some SQL Query that you can try on your own using [Amazon Athena Console UI]((https://us-west-2.console.aws.amazon.com/athena/home?region=us-west-2#query/)). This step is optional for this demo, but it helps you explore and learn more about Amazon Athena using Console UI
 
 ```sql
 -- The following query returns the growth of confirmed cases for the past 7 days joined side-by-side with hospital bed availability, broken down by US county:
-SELECT 
-  cases.fips, 
-  admin2 as county, 
-  province_state, 
+SELECT
+  cases.fips,
+  admin2 as county,
+  province_state,
   confirmed,
-  growth_count, 
-  sum(num_licensed_beds) as num_licensed_beds, 
-  sum(num_staffed_beds) as num_staffed_beds, 
+  growth_count,
+  sum(num_licensed_beds) as num_licensed_beds,
+  sum(num_staffed_beds) as num_staffed_beds,
   sum(num_icu_beds) as num_icu_beds
-FROM 
-  "covid-19"."hospital_beds" beds, 
-  ( SELECT 
-      fips, 
-      admin2, 
-      province_state, 
-      confirmed, 
+FROM
+  "covid-19"."hospital_beds" beds,
+  ( SELECT
+      fips,
+      admin2,
+      province_state,
+      confirmed,
       last_value(confirmed) over (partition by fips order by last_update) - first_value(confirmed) over (partition by fips order by last_update) as growth_count,
       first_value(last_update) over (partition by fips order by last_update desc) as most_recent,
       last_update
-    FROM  
-      "covid-19"."enigma_jhu" 
-    WHERE 
+    FROM
+      "covid-19"."enigma_jhu"
+    WHERE
       from_iso8601_timestamp(last_update) > now() - interval '200' day AND country_region = 'US') cases
-WHERE 
+WHERE
   beds.fips = cases.fips AND last_update = most_recent
 GROUP BY cases.fips, confirmed, growth_count, admin2, province_state
 ORDER BY growth_count desc
@@ -132,7 +107,7 @@ ORDER BY growth_count desc
 SELECT * FROM "covid-19"."world_cases_deaths_testing" order by "date" desc limit 10;
 
 -- Last 10 records regarding Testing and deaths with JOIN on us_state_abbreviations to list State name
-SELECT 
+SELECT
    date,
    positive,
    negative,
@@ -145,7 +120,7 @@ SELECT
    negativeincrease,
    positiveincrease,
    sta.state AS state_abbreviation,
-   abb.state 
+   abb.state
 
 FROM "covid-19"."covid_testing_states_daily" sta
 JOIN "covid-19"."us_state_abbreviations" abb ON sta.state = abb.abbreviation
@@ -183,7 +158,7 @@ S3_RESULT_BUCKET_NAME=s3://athena-results-netcore-s3bucket-xxxxxxxxxxxx/athena/r
 docker-compose -f ./docker-compose.yml build
 ```
 
-4) Run .NET APP docker-compose 
+4) Run .NET APP docker-compose
 
 ```bash
 docker-compose -f ./docker-compose.yml up
@@ -205,12 +180,12 @@ aws cloudformation delete-stack --stack-name athena-results-netcore --region us-
 # 4) Delete Athena Tables
 aws cloudformation delete-stack --stack-name covid-lake-stack
 
- 
+
 
 ```
 # References
 
-<https://aws.amazon.com/blogs/big-data/a-public-data-lake-for-analysis-of-covid-19-data/> 
+<https://aws.amazon.com/blogs/big-data/a-public-data-lake-for-analysis-of-covid-19-data/>
 
 <https://docs.aws.amazon.com/athena/latest/ug/code-samples.html>
 
