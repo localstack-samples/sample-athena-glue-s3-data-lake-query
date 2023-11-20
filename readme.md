@@ -31,7 +31,7 @@ We are using the following AWS services and their features to build our infrastr
 - LocalStack Pro with the [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli).
 - [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`awslocal` wrapper](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal).
 
-We are using Athena & Glue Data Catalog in our sample application. These services are available in a BigData Mono container which installs dependencies directly into the LocalStack (`localstack_main`) container. While launching these services for the first time, the BigData Mono container will download the required dependencies (Hadoop, Hive, Presto, etc.) and install them into the LocalStack container. This process may take a few minutes. 
+We are using Athena & Glue Data Catalog in our sample application. These services are available in a BigData Mono container which installs dependencies directly into the LocalStack (`localstack-main`) container. While launching these services for the first time, the BigData Mono container will download the required dependencies (Hadoop, Hive, Presto, etc.) and install them into the LocalStack container. This process may take a few minutes. 
 
 To circumvent this, you can pull the `localstack/localstack-pro:2.0.0-bigdata` Mono container image with pre-installed default dependencies. You can launch the container with the LocalStack CLI or via [Docker](https://docs.localstack.cloud/getting-started/installation/#docker)/[Docker Compose](https://docs.localstack.cloud/getting-started/installation/#docker-compose).
 
