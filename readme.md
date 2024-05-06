@@ -35,10 +35,10 @@ We are using Athena & Glue Data Catalog in our sample application. These service
 
 To circumvent this, you can pull the `localstack/localstack-pro:2.0.0-bigdata` Mono container image with pre-installed default dependencies. You can launch the container with the LocalStack CLI or via [Docker](https://docs.localstack.cloud/getting-started/installation/#docker)/[Docker Compose](https://docs.localstack.cloud/getting-started/installation/#docker-compose).
 
-Start LocalStack Pro with the `LOCALSTACK_API_KEY` pre-configured:
+Start LocalStack Pro with the `LOCALSTACK_AUTH_TOKEN` pre-configured:
 
 ```sh
-export LOCALSTACK_API_KEY=<your-api-key>
+export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
 localstack start
 ```
 
@@ -78,7 +78,7 @@ If the StackStatus is `CREATE_COMPLETE`, you can proceed to the next step.
 
 ### Running Athena SQL queries
 
-After the CloudFormation stack has been deployed in LocalStack, you can run queries against the data. To make testing more accessible, we have an [Athena SQL viewer](https://app.localstack.cloud/resources/athena/sql) in the LocalStack Web Application. You can run queries against the `covid-19` database in the Glue Data Catalog.
+After the CloudFormation stack has been deployed in LocalStack, you can run queries against the data. To make testing more accessible, we have an [Athena SQL viewer](https://app.localstack.cloud/inst/default/resources/athena/sql) in the LocalStack Web Application. You can run queries against the `covid-19` database in the Glue Data Catalog.
 
 Run the query to fetch the hospital beds per US state:
 
