@@ -30,14 +30,13 @@ jobs:
 
       - name: Start LocalStack
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          DNS_ADDRESS: 0
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
         run: |
           pip install localstack awscli-local[ver1]
-          docker pull localstack/localstack-pro:latest
+          docker pull localstack/localstack-pro:latest-bigdata
 
           # Start LocalStack in the background
-          localstack start -d
+          IMAGE_NAME=localstack/localstack-pro:latest-bigdata localstack start -d
 
           # Wait 30 seconds for the LocalStack container to become ready before timing out
           echo "Waiting for LocalStack startup..."
@@ -51,8 +50,13 @@ jobs:
 
       - name: Check deployed resources
         run: |
-          sleep 20
+          sleep 30
           awslocal cloudformation describe-stacks --stack-name covid-lake-stack
+
+      - name: Run tests
+        run: |
+          pip3 install pandas boto3 pytest
+          pytest test_infra.py
       
       - name: Send a Slack notification
         if: failure() || github.event_name != 'pull_request'
