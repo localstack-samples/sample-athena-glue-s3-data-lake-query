@@ -1,4 +1,4 @@
-name: LocalStack Setup
+name: Deploy infrastructure using CloudFormation
 
 on:
   push:
@@ -16,44 +16,42 @@ on:
 
 jobs:
   cloudformation:
-    name: Deploy infrastructure using CloudFormation
+    name: Run integration tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Python 3.10
+      - name: Set up Python
         id: setup-python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Start LocalStack
+        uses: LocalStack/setup-localstack@main
+        with:
+          image-tag: 'latest'
+          use-pro: 'true'
+          configuration: LS_LOG=trace
+          install-awslocal: 'true'
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          DNS_ADDRESS: 0
-        run: |
-          pip install localstack awscli-local[ver1]
-          docker pull localstack/localstack-pro:latest
-
-          # Start LocalStack in the background
-          localstack start -d
-
-          # Wait 30 seconds for the LocalStack container to become ready before timing out
-          echo "Waiting for LocalStack startup..."
-          localstack wait -t 15
-
-          echo "Startup complete"
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+          IMAGE_NAME: 'localstack/localstack-pro:latest-bigdata'
 
       - name: Deploy on CloudFormation
         run: |
-          make setup
+          make deploy
 
-      - name: Check deployed resources
+      - name: Run tests
         run: |
-          sleep 20
-          awslocal cloudformation describe-stacks --stack-name covid-lake-stack
-      
+          make test
+
+      - name: Show LocalStack logs
+        if: always()
+        run: |
+          localstack logs
+
       - name: Send a Slack notification
         if: failure() || github.event_name != 'pull_request'
         uses: ravsamhq/notify-slack-action@v2

@@ -7,7 +7,7 @@
           "Ref": "AWS::AccountId"
         },
         "DatabaseInput": {
-          "Name": "covid-19"
+          "Name": "covid_19"
         }
       },
       "Metadata": {
