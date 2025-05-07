@@ -20,7 +20,7 @@ deploy:		## Setup the architecture
 	@echo "Deploying the architecture..."
 	@echo "Create S3 bucket and upload the CloudFormation template..."
 	awslocal s3 mb s3://covid19-lake; \
-	awslocal s3 cp CovidLakeStack.template.json s3://covid19-lake/cfn/CovidLakeStack.template.json; \
+	awslocal s3 cp cloudformation-templates/CovidLakeStack.template.json s3://covid19-lake/cfn/CovidLakeStack.template.json; \
 	awslocal s3 sync ./covid19-lake-data/ s3://covid19-lake/; \
 	awslocal cloudformation create-stack --stack-name covid-lake-stack --template-url http://s3.localhost.localstack.cloud:4566/covid19-lake/cfn/CovidLakeStack.template.json
 	@counter=0; \

@@ -221,7 +221,7 @@ class TestAthenaQueries:
         except Exception as e:
             pytest.fail(f"Test {table_to_query} failed: {str(e)}")
 
-    @pytest.mark.skip(reason="Temporarily disabling tests for 'hospital_beds' due to persistent Athena query issues.")
+    # @pytest.mark.skip(reason="Temporarily disabling tests for 'hospital_beds' due to persistent Athena query issues.")
     def test_hospital_beds_query(self, athena_client, output_location):
         table_to_query = 'hospital_beds'
         query = f"SELECT * FROM {table_to_query} LIMIT 10"
@@ -238,7 +238,7 @@ class TestAthenaQueries:
             pytest.fail(f"Could not query {self.DATABASE_NAME}.{table_to_query} table: {str(e)}")
 
 
-    @pytest.mark.skip(reason="Temporarily disabling tests for 'cdc_moderna_vaccine_distribution' due to persistent Athena query issues.")
+    # @pytest.mark.skip(reason="Temporarily disabling tests for 'cdc_moderna_vaccine_distribution' due to persistent Athena query issues.")
     def test_moderna_vaccine_distribution_query(self, athena_client, output_location):
         table_to_query = 'cdc_moderna_vaccine_distribution'
         query = f"SELECT * FROM {table_to_query} WHERE jurisdiction IN ('Vermont', 'New Jersey')"
@@ -267,7 +267,7 @@ class TestAthenaQueries:
         except Exception as e:
             pytest.fail(f"Test {table_to_query} failed: {str(e)}")
 
-    @pytest.mark.skip(reason="Temporarily disabling cross-table query due to issues with dependent tables.")
+    # @pytest.mark.skip(reason="Temporarily disabling cross-table query due to issues with dependent tables.")
     def test_cross_table_query(self, athena_client, output_location):
         query = """
         SELECT 
