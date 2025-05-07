@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 class TestAthenaQueries:
     """Test suite for validating Athena SQL queries against Glue Catalog tables."""
 
-    DATABASE_NAME = 'covid-19'
+    DATABASE_NAME = 'covid_19'
     # Using a table known to be more stable with Athena in LocalStack
     KEY_TABLE_NAME = 'enigma_aggregation_us_states'
 
