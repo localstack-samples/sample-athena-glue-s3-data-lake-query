@@ -41,7 +41,7 @@ jobs:
 
       - name: Deploy on CloudFormation
         run: |
-          make setup
+          make deploy
 
       - name: Check deployed resources
         run: |
@@ -50,9 +50,8 @@ jobs:
 
       - name: Run tests
         run: |
-          pip3 install pandas boto3 pytest
-          pytest test_infra.py
-      
+          make test
+
       - name: Show LocalStack logs
         if: always()
         run: |
