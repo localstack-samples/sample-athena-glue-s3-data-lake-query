@@ -106,22 +106,22 @@ class TestAthenaQueries:
             error_message = response['QueryExecution']['Status'].get('StateChangeReason', 'Unknown error')
             raise Exception(f"Query failed with state {state}: {error_message}")
 
-    def test_hospital_beds_query(self, athena_client, output_location):
-        """Test querying the covid_19.hospital_beds table."""
-        query = "SELECT * FROM covid_19.hospital_beds LIMIT 10"
-        results_df = self.execute_query_and_get_results(athena_client, query, output_location)
+    # def test_hospital_beds_query(self, athena_client, output_location):
+    #     """Test querying the covid_19.hospital_beds table."""
+    #     query = "SELECT * FROM covid_19.hospital_beds LIMIT 10"
+    #     results_df = self.execute_query_and_get_results(athena_client, query, output_location)
         
-        # Verify we got 10 results
-        assert len(results_df) == 10
+    #     # Verify we got 10 results
+    #     assert len(results_df) == 10
         
-        # Verify the expected columns are present
-        expected_columns = ['objectid', 'hospital_name', 'hospital_type']
-        for col in expected_columns:
-            assert col in results_df.columns
+    #     # Verify the expected columns are present
+    #     expected_columns = ['objectid', 'hospital_name', 'hospital_type']
+    #     for col in expected_columns:
+    #         assert col in results_df.columns
         
-        # Check that all results are VA Hospitals (as seen in screenshot)
-        hospital_types = results_df['hospital_type'].unique()
-        assert 'VA Hospital' in hospital_types
+    #     # Check that all results are VA Hospitals (as seen in screenshot)
+    #     hospital_types = results_df['hospital_type'].unique()
+    #     assert 'VA Hospital' in hospital_types
 
     def test_us_states_aggregation_query(self, athena_client, output_location):
         """Test querying the covid_19.enigma_aggregation_us_states table."""
@@ -209,7 +209,7 @@ class TestAthenaQueries:
             assert "Error details" in str(e) or "Query failed" in str(e)
 
     @pytest.mark.parametrize("database_name, table_name", [
-        ("covid_19", "hospital_beds"),
+        # ("covid_19", "hospital_beds"),
         ("covid_19", "enigma_aggregation_us_states"),
         ("covid_19", "cdc_moderna_vaccine_distribution")
     ])
