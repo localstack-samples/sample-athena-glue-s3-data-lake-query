@@ -8,7 +8,6 @@ class TestAthenaQueries:
     """Test suite for validating Athena SQL queries against Glue Catalog tables."""
 
     DATABASE_NAME = 'covid_19'
-    # Using a table known to be more stable with Athena in LocalStack
     KEY_TABLE_NAME = 'enigma_aggregation_us_states'
 
     @pytest.fixture(scope="class")
@@ -161,11 +160,9 @@ class TestAthenaQueries:
                         raise last_exception
                     else:
                         raise Exception(f"Query execution failed after all retries for '{query}': {str(last_exception)}")
-        if last_exception: # Should be unreachable if logic above is correct
+        if last_exception:
              raise Exception(f"Query '{query}' failed after all retries. Last error: {str(last_exception)}")
-        return pd.DataFrame() 
-
-    # ----- Test Cases -----
+        return pd.DataFrame()
 
     def test_database_existence(self, athena_client, output_location):
         query = "SHOW DATABASES"
@@ -188,7 +185,6 @@ class TestAthenaQueries:
             assert len(tables) > 0, f"No tables found in {self.DATABASE_NAME} database via Athena."
             assert self.KEY_TABLE_NAME in tables, f"Key table '{self.KEY_TABLE_NAME}' not found by Athena's SHOW TABLES."
             
-            # Log if other tables are missing, but don't fail for them here
             if 'hospital_beds' not in tables:
                 print(f"Note: 'hospital_beds' not found in Athena's SHOW TABLES list.")
             if 'cdc_moderna_vaccine_distribution' not in tables:
@@ -303,8 +299,6 @@ class TestAthenaQueries:
 
     @pytest.mark.parametrize("table_name_param", [
         "enigma_aggregation_us_states",
-        # Add other tables here one by one as you confirm their CFN definitions are correct and they work with Athena
-        # e.g., "cdc_pfizer_vaccine_distribution" once its SerDe is confirmed/fixed
     ])
     def test_table_existence_and_schema_via_athena(self, athena_client, output_location, table_name_param, glue_client):
         try:
