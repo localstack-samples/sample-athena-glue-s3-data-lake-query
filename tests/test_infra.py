@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 class TestAthenaQueries:
     """Test suite for validating Athena SQL queries against Glue Catalog tables."""
 
-    DATABASE_NAME = 'covid_19'
+    DATABASE_NAME = 'covid-19'
     # Pick a table that is created by CloudFormation and is crucial for tests.
     # 'hospital_beds' is a good candidate as it's directly tested.
     KEY_TABLE_NAME = 'hospital_beds'
