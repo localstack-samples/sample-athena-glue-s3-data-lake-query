@@ -33,10 +33,11 @@ jobs:
         with:
           image-tag: 'latest'
           use-pro: 'true'
-          configuration: LS_LOG=trace, IMAGE_NAME=localstack/localstack-pro:latest-bigdata
+          configuration: LS_LOG=trace
           install-awslocal: 'true'
         env:
           LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+          IMAGE_NAME: 'localstack/localstack-pro:latest-bigdata'
 
       - name: Deploy on CloudFormation
         run: |
