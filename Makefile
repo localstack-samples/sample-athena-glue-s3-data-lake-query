@@ -22,7 +22,7 @@ deploy:		## Setup the architecture
 	awslocal s3 mb s3://covid19-lake; \
 	awslocal s3 cp CovidLakeStack.template.json s3://covid19-lake/cfn/CovidLakeStack.template.json; \
 	awslocal s3 sync ./covid19-lake-data/ s3://covid19-lake/; \
-	awslocal cloudformation create-stack --stack-name covid-lake-stack --template-url https://covid19-lake.s3.us-east-2.amazonaws.com/cfn/CovidLakeStack.template.json
+	awslocal cloudformation create-stack --stack-name covid-lake-stack --template-url http://s3.localhost.localstack.cloud:4566/covid19-lake/cfn/CovidLakeStack.template.json
 	@counter=0; \
 	while [ $$counter -lt 30 ]; do \
 		status=$$(awslocal cloudformation describe-stacks --stack-name covid-lake-stack | grep StackStatus | cut -d'"' -f4); \
