@@ -14,11 +14,10 @@
 
 This sample demonstrates how to build a comprehensive data analytics pipeline using Amazon Athena, S3, and Glue Catalog to query large datasets stored in a data lake. Starting with raw COVID-19 datasets from the [Registry of Open Data on AWS](https://registry.opendata.aws/), you'll deploy a complete analytics infrastructure that enables running standard SQL queries against structured data in S3 buckets. To test this application sample, we will demonstrate how you use LocalStack to deploy the infrastructure on your developer machine and validate big data workflows locally. The demo showcases LocalStack's [Resource Browser capabilities](https://docs.localstack.cloud/aws/capabilities/web-app/resource-browser/) for exploring Athena databases and running interactive SQL queries without the cost and complexity of AWS infrastructure.
 
-:::note
-- Initial service startup may take several minutes for dependency installation
-- Query performance is optimized for development testing, not production-scale analytics
-- Dataset size is limited to sample COVID-19 data for demonstration purposes
-:::
+> [!NOTE]
+> - Initial service startup may take several minutes for dependency installation
+> - Query performance is optimized for development testing, not production-scale analytics
+> - Dataset size is limited to sample COVID-19 data for demonstration purposes
 
 ## Architecture
 
@@ -38,13 +37,12 @@ The following diagram shows the architecture that this sample application builds
 - [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`awslocal` wrapper](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal)
 - [`make`](https://www.gnu.org/software/make/) (**optional**, but recommended for running the sample application)
 
-:::note
-This sample uses Athena & Glue Data Catalog which requires various dependencies to be lazily downloaded and installed at runtime, which increases the processing time on the first load. To mitigate this, you can pull the Big Data Mono container image with the default dependencies pre-installed.
-```shell
-docker pull localstack/localstack-pro:latest-bigdata
-```
-Start the container with `IMAGE_NAME=localstack/localstack-pro:latest-bigdata` configuration variable to use the pre-installed dependencies.
-:::
+> [!NOTE]
+> This sample uses Athena & Glue Data Catalog which requires various dependencies to be lazily downloaded and installed at runtime, which increases the processing time on the first load. To mitigate this, you can pull the Big Data Mono container image with the default dependencies pre-installed.
+> ```shell
+> docker pull localstack/localstack-pro:latest-bigdata
+> ```
+> Start the container with `IMAGE_NAME=localstack/localstack-pro:latest-bigdata` configuration variable to use the pre-installed dependencies.
 
 ## Installation
 
