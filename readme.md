@@ -115,7 +115,7 @@ Run queries against the `covid-19` database in the Glue Data Catalog:
 SELECT * FROM covid_19.hospital_beds LIMIT 10
 ```
 
-// Space for screenshot: hospital-beds-per-us-state-athena-query.png
+![Hospital beds data](./images/athena-sql-1.png)
 
 #### Aggregated COVID data by states
 
@@ -123,7 +123,7 @@ SELECT * FROM covid_19.hospital_beds LIMIT 10
 SELECT * FROM covid_19.enigma_aggregation_us_states
 ```
 
-// Space for screenshot: agreggated-covid-test-data-cases-athena-query.png
+![Aggregated COVID data by states](./images/athena-sql-2.png)
 
 #### Moderna vaccine distribution
 
@@ -131,7 +131,7 @@ SELECT * FROM covid_19.enigma_aggregation_us_states
 SELECT * FROM covid_19.cdc_moderna_vaccine_distribution
 ```
 
-// Space for screenshot: moderna-vaccine-allocations-athena-query.png
+![Moderna vaccine distribution](./images/athena-sql-3.png)
 
 #### Integration tests
 
