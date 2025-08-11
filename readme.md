@@ -1,122 +1,207 @@
-# Query data in S3 Bucket with Amazon Athena, Glue Catalog & CloudFormation
+# Querying a Data Lake on S3 with Athena & Glue on LocalStack
 
-| Key          | Value                                                                                 |
-| ------------ | ------------------------------------------------------------------------------------- |
-| Environment  | <img src="https://img.shields.io/badge/LocalStack-deploys-4D29B4.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAKgAAACoABZrFArwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAALbSURBVHic7ZpNaxNRFIafczNTGIq0G2M7pXWRlRv3Lusf8AMFEQT3guDWhX9BcC/uFAr1B4igLgSF4EYDtsuQ3M5GYrTaj3Tmui2SpMnM3PlK3m1uzjnPw8xw50MoaNrttl+r1e4CNRv1jTG/+v3+c8dG8TSilHoAPLZVX0RYWlraUbYaJI2IuLZ7KKUWCisgq8wF5D1A3rF+EQyCYPHo6Ghh3BrP8wb1en3f9izDYlVAp9O5EkXRB8dxxl7QBoNBpLW+7fv+a5vzDIvVU0BELhpjJrmaK2NMw+YsIxunUaTZbLrdbveZ1vpmGvWyTOJToNlsuqurq1vAdWPMeSDzwzhJEh0Bp+FTmifzxBZQBXiIKaAq8BBDQJXgYUoBVYOHKQRUER4mFFBVeJhAQJXh4QwBVYeHMQJmAR5GCJgVeBgiYJbg4T8BswYPp+4GW63WwvLy8hZwLcd5TudvBj3+OFBIeA4PD596nvc1iiIrD21qtdr+ysrKR8cY42itCwUP0Gg0+sC27T5qb2/vMunB/0ipTmZxfN//orW+BCwmrGV6vd63BP9P2j9WxGbxbrd7B3g14fLfwFsROUlzBmNM33XdR6Meuxfp5eg54IYxJvXCx8fHL4F3w36blTdDI4/0WREwMnMBeQ+Qd+YC8h4g78wF5D1A3rEqwBiT6q4ubpRSI+ewuhP0PO/NwcHBExHJZZ8PICI/e73ep7z6zzNPwWP1djhuOp3OfRG5kLROFEXv19fXP49bU6TbYQDa7XZDRF6kUUtEtoFb49YUbh/gOM7YbwqnyG4URQ/PWlQ4ASllNwzDzY2NDX3WwioKmBgeqidgKnioloCp4aE6AmLBQzUExIaH8gtIBA/lFrCTFB7KK2AnDMOrSeGhnAJSg4fyCUgVHsolIHV4KI8AK/BQDgHW4KH4AqzCQwEfiIRheKKUAvjuuu7m2tpakPdMmcYYI1rre0EQ1LPo9w82qyNziMdZ3AAAAABJRU5ErkJggg=="> <img src="https://img.shields.io/badge/AWS-deploys-F29100.svg?logo=amazon">                                                                     |
-| Services     | Glue, Athena, S3, CloudFormation                    |
-| Integrations | CloudFormation                                                    |
-| Categories   | Big Data                            |
-| Level        | Intermediate                                                                          |
-| GitHub       | [Repository link](https://github.com/aws-samples/query-data-in-s3-with-amazon-athena-and-aws-sdk-for-dotnet) |
+| Key          | Value                                                                             |
+| ------------ | --------------------------------------------------------------------------------- |
+| Environment  | LocalStack, AWS                                                                   |
+| Services     | S3, Athena, Glue, CloudFormation                                                  |
+| Integrations | AWS CLI, CloudFormation                                                           |
+| Categories   | Big Data, Analytics, Data Lake                                                    |
+| Level        | Intermediate                                                                      |
+| Use Case     | Resource Browsers, Big Data Testing                                               |
+| GitHub       | [Repository link](https://github.com/localstack/sample-query-data-s3-athena-glue) |
 
 ## Introduction
 
-The Query data in S3 Bucket application sample demonstrates how you can leverage Amazon Athena to run standard SQL to analyze a large amount of data in Amazon S3 buckets. The application sample fetches COVID-19 data from the [Registry of Open Data on AWS](https://registry.opendata.aws/) and allows you to run Athena SQL queries using the [LocalStack Web Application](https://app.localstack.cloud) to list the results from Athena Database/Tables. Users can deploy this application setup via Glue Catalog on AWS & LocalStack using CloudFormation with no changes. To test this application sample, we will demonstrate how you use LocalStack to deploy the infrastructure on your developer machine and your CI environment and run queries against the deployed resources on LocalStack's [Athena Resource Browser](https://app.localstack.cloud/resources/athena/sql). 
+This sample demonstrates how to build a comprehensive data analytics pipeline using Amazon Athena, S3, and Glue Catalog to query large datasets stored in a data lake. Starting with raw COVID-19 datasets from the [Registry of Open Data on AWS](https://registry.opendata.aws/), you'll deploy a complete analytics infrastructure that enables running standard SQL queries against structured data in S3 buckets. To test this application sample, we will demonstrate how you use LocalStack to deploy the infrastructure on your developer machine and validate big data workflows locally. The demo showcases LocalStack's [Resource Browser capabilities](https://docs.localstack.cloud/aws/capabilities/web-app/resource-browser/) for exploring Athena databases and running interactive SQL queries without the cost and complexity of AWS infrastructure.
 
-## Architecture diagram
+> [!NOTE]
+> - Initial service startup may take several minutes for dependency installation
+> - Query performance is optimized for development testing, not production-scale analytics
+> - Dataset size is limited to sample COVID-19 data for demonstration purposes
+
+## Architecture
 
 The following diagram shows the architecture that this sample application builds and deploys:
 
 ![Architecture diagram to showcase how we can query data in S3 Bucket with Amazon Athena, Glue Catalog deployed using CloudFormation over LocalStack](./images/architecture.png)
 
-We are using the following AWS services and their features to build our infrastructure:
-
-- [S3](https://docs.localstack.cloud/user-guide/aws/s3/) to store the datasets and the results of the Athena SQL queries.
-- [Glue](https://docs.localstack.cloud/user-guide/aws/glue/) Data Catalog to set up the definitions for that data and create the database & tables.
-- [Athena](https://docs.localstack.cloud/user-guide/aws/athena/) as a serverless interactive query service to query the data in the AWS COVID-19 data lake.
-- [CloudFormation](https://docs.localstack.cloud/user-guide/aws/cloudformation/) as an Infrastructure-as-Code (IaC) framework to create our stack, which includes the `covid-19` database in our Data Catalog.
+- [S3 Buckets](https://docs.localstack.cloud/aws/services/s3/) for storing COVID-19 datasets and Athena query results
+- [Glue Data Catalog](https://docs.localstack.cloud/aws/services/glue/) for metadata management and schema definitions
+- [Athena](https://docs.localstack.cloud/aws/services/athena/) serverless query service for interactive SQL analytics
+- [CloudFormation](https://docs.localstack.cloud/aws/services/cloudformation/) for Infrastructure as Code deployment
+- Multiple data sources: hospital beds, vaccine distribution, and aggregated case data
 
 ## Prerequisites
 
-- LocalStack Pro with the [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli).
-- [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`awslocal` wrapper](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal).
+- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/)
+- [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`awslocal` wrapper](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal)
+- [`make`](https://www.gnu.org/software/make/) (**optional**, but recommended for running the sample application)
 
-We are using Athena & Glue Data Catalog in our sample application. These services are available in a BigData Mono container which installs dependencies directly into the LocalStack (`localstack-main`) container. While launching these services for the first time, the BigData Mono container will download the required dependencies (Hadoop, Hive, Presto, etc.) and install them into the LocalStack container. This process may take a few minutes. 
+> [!NOTE]
+> This sample uses Athena & Glue Data Catalog which requires various dependencies to be lazily downloaded and installed at runtime, which increases the processing time on the first load. To mitigate this, you can pull the Big Data Mono container image with the default dependencies pre-installed.
+> ```shell
+> docker pull localstack/localstack-pro:latest-bigdata
+> ```
+> Start the container with `IMAGE_NAME=localstack/localstack-pro:latest-bigdata` configuration variable to use the pre-installed dependencies.
 
-To circumvent this, you can pull the `localstack/localstack-pro:2.0.0-bigdata` Mono container image with pre-installed default dependencies. You can launch the container with the LocalStack CLI or via [Docker](https://docs.localstack.cloud/getting-started/installation/#docker)/[Docker Compose](https://docs.localstack.cloud/getting-started/installation/#docker-compose).
+## Installation
+
+To run the sample application, you need to install the required dependencies.
+
+First, clone the repository:
+
+```shell
+git clone https://github.com/localstack/sample-athena-glue-s3-data-lake-query.git
+```
+
+Then, navigate to the project directory:
+
+```shell
+cd sample-athena-glue-s3-data-lake-query
+```
+
+No additional installation steps are required as the sample uses CloudFormation templates and AWS CLI commands.
+
+## Deployment
 
 Start LocalStack Pro with the `LOCALSTACK_AUTH_TOKEN` pre-configured:
 
-```sh
-export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack start
+```shell
+localstack auth set-token <LOCALSTACK_AUTH_TOKEN>
+IMAGE_NAME=localstack/localstack-pro:latest-bigdata localstack start
 ```
 
-> If you prefer running LocalStack in detached mode, you can add the `-d` flag to the `localstack start` command, and use Docker Desktop to view the logs.
+To deploy the sample application infrastructure, run the following command:
 
-## Instructions
+```shell
+make deploy
+```
 
-You can build and deploy the sample application on LocalStack by running our `Makefile` commands. Run `make setup` to create the infrastructure on LocalStack. Run `make stop` to delete the infrastructure by stopping LocalStack.
+Alternatively, you can deploy manually step-by-step.
 
-Alternatively, here are instructions to deploy it manually step-by-step.
+### Create S3 bucket and upload data
 
-### Creating the S3 bucket
-
-We will create an S3 bucket to store the datasets. We will use the `awslocal` CLI to create the bucket.
-
-```sh
+```shell
 awslocal s3 mb s3://covid19-lake
-awslocal s3 cp CovidLakeStack.template.json s3://covid19-lake/cfn/CovidLakeStack.template.json
+awslocal s3 cp cloudformation-templates/CovidLakeStack.template.json s3://covid19-lake/cfn/CovidLakeStack.template.json
 awslocal s3 sync ./covid19-lake-data/ s3://covid19-lake/
 ```
 
-### Creating the Glue Data Catalog
+### Deploy CloudFormation stack
 
-We will create a Glue Data Catalog to set up the definitions for that data and create the database & tables. We will use the `awslocal` CLI to create the database and tables.
-
-```sh
+```shell
 awslocal cloudformation create-stack --stack-name covid-lake-stack --template-url https://covid19-lake.s3.us-east-2.amazonaws.com/cfn/CovidLakeStack.template.json
 ```
 
-Wait for a few seconds for the infrastructure to be created. You can check the status of the stack using the following command:
+### Verify deployment
 
-```sh
+```shell
 awslocal cloudformation describe-stacks --stack-name covid-lake-stack | grep StackStatus
 ```
 
-If the StackStatus is `CREATE_COMPLETE`, you can proceed to the next step.
+Wait for `CREATE_COMPLETE` status before proceeding.
 
-### Running Athena SQL queries
+## Testing
 
-After the CloudFormation stack has been deployed in LocalStack, you can run queries against the data. To make testing more accessible, we have an [Athena SQL viewer](https://app.localstack.cloud/inst/default/resources/athena/sql) in the LocalStack Web Application. You can run queries against the `covid-19` database in the Glue Data Catalog.
+After deployment, you can test the analytics pipeline using the LocalStack Web Application's Athena SQL viewer at [https://app.localstack.cloud/inst/default/resources/athena/sql](https://app.localstack.cloud/inst/default/resources/athena/sql).
 
-Run the query to fetch the hospital beds per US state:
+### Query Examples
+
+Run queries against the `covid-19` database in the Glue Data Catalog:
+
+#### Hospital beds data
 
 ```sql
 SELECT * FROM covid_19.hospital_beds LIMIT 10
 ```
 
-You will see the results of the query in the Athena SQL viewer:
+![Hospital beds data](./images/athena-sql-1.png)
 
-![Results of the query in the Athena SQL viewer for hospital beds per US state](./images/hospital-beds-per-us-state-athena-query.png)
-
-Run the query to get agreggated COVID test data and cases:
+#### Aggregated COVID data by states
 
 ```sql
 SELECT * FROM covid_19.enigma_aggregation_us_states
 ```
 
-You will see the results of the query in the Athena SQL viewer:
+![Aggregated COVID data by states](./images/athena-sql-2.png)
 
-![Results of the query in the Athena SQL viewer for aggregated COVID test data and cases](./images/agreggated-covid-test-data-cases-athena-query.png)
-
-Run the query to get the list of Moderna vaccine allocations:
+#### Moderna vaccine distribution
 
 ```sql
 SELECT * FROM covid_19.cdc_moderna_vaccine_distribution
 ```
 
-You will see the results of the query in the Athena SQL viewer:
+![Moderna vaccine distribution](./images/athena-sql-3.png)
 
-![Results of the query in the Athena SQL viewer for the list of Moderna vaccine allocations](./images/moderna-vaccine-allocations-athena-query.png)
+#### Integration tests
 
-You can write your own queries to explore the data in the COVID-19 data lake through LocalStack's Athena Resource Browser.
+You can also run automated integration tests:
 
-## Learn more
+```shell
+make test
+```
 
-The sample application is based on a [public AWS sample app](https://github.com/aws-samples/query-data-in-s3-with-amazon-athena-and-aws-sdk-for-dotnet) that leverages Amazon Athena from .NET Core Application using AWS SDK for .NET to run standard SQL to analyze a large amount of data in Amazon S3. See this AWS blog post for more details: [A public data lake for analysis of COVID-19 data](https://aws.amazon.com/blogs/big-data/a-public-data-lake-for-analysis-of-covid-19-data/).
+## Use Cases
 
-## Contributing
+### Resource Browsers
 
-We appreciate your interest in contributing to our project and are always looking for new ways to improve the developer experience. We welcome feedback, bug reports, and even feature ideas from the community.
-Please refer to the [contributing file](CONTRIBUTING.md) for more details on how to get started. 
+In this sample, LocalStack's Resource Browser provides a web-based interface for interacting with Athena and Glue services without requiring additional tooling or AWS console access.
+
+The [Resource Browser](https://app.localstack.cloud/inst/default/resources/athena/sql) allows you to:
+
+- Browse Glue Data Catalog databases and tables through the left navigation panel
+- Execute SQL queries directly in the browser with syntax highlighting and result formatting
+- View query execution history and rerun previous queries for iterative development
+
+This approach eliminates the need to install and configure local SQL clients or connect to remote AWS services during development.
+
+### Big Data Testing
+
+This sample includes patterns for testing big data workflows locally before deploying to production environments. LocalStack enables comprehensive validation of big data components without cloud infrastructure costs.
+
+Key testing scenarios include:
+
+- Schema and Metadata Testing:
+    - Validate Glue Data Catalog table definitions and column mappings
+    - Test partitioning strategies and data formats (JSON, CSV, Parquet)
+    - Verify CloudFormation template creates correct database and table structures
+- Query Testing:
+    - Execute representative SQL queries against sample datasets
+    - Validate query execution plans and optimization strategies
+    - Test different table join patterns and aggregation logic
+- Integration Testing:
+    - End-to-end validation from S3 data ingestion through Athena query execution
+    - Verify S3 bucket policies and access patterns work correctly
+
+LocalStack's isolated environment ensures tests don't interfere with production data while providing realistic AWS service behavior for comprehensive validation.
+
+## Troubleshooting
+
+| Issue | Resolution |
+|-------|-----------|
+| Big Data services taking long to start | Use the pre-built `localstack-pro:latest-bigdata` Docker image to avoid dependency installation |
+| CloudFormation stack creation fails | Verify S3 bucket exists and template is uploaded before creating stack |
+| Athena queries return no results | Check Glue Data Catalog tables are created and S3 data is properly uploaded |
+| Resource Browser not loading | Ensure LocalStack is running and the stack has been created successfully |
+| Query execution timeouts | Reduce query complexity for development testing and review the LocalStack logs for any errors |
+
+## Summary
+
+This sample application demonstrates how to build, deploy, and test a complete big data analytics pipeline using AWS services and LocalStack. It showcases the following patterns:
+
+- Deploying scalable data lake architectures using S3, Athena, and Glue Data Catalog with CloudFormation
+- Running interactive SQL analytics against large datasets stored in S3 buckets
+- Using LocalStack's Resource Browser for intuitive data exploration and query development
+- Implementing comprehensive testing strategies for big data workflows in local environments
+- Leveraging AWS parity to ensure consistent behavior between development and production environments
+- Managing metadata and schema evolution through Glue Data Catalog integration
+
+The application provides a foundation for understanding enterprise data analytics patterns and building cost-effective development workflows for AWS big data services.
+
+## Learn More
+
+- [LocalStack Athena Documentation](https://docs.localstack.cloud/aws/services/athena/)
+- [LocalStack Glue Data Catalog](https://docs.localstack.cloud/aws/services/glue/)
+- [LocalStack Resource Browser](https://docs.localstack.cloud/user-guide/web-application/resource-browser/)
+- [AWS Data Lake Architecture](https://aws.amazon.com/big-data/datalakes-and-analytics/)
+- [COVID-19 Data Lake Blog Post](https://aws.amazon.com/blogs/big-data/a-public-data-lake-for-analysis-of-covid-19-data/)
