@@ -51,7 +51,7 @@ To run the sample application, you need to install the required dependencies.
 First, clone the repository:
 
 ```shell
-git clone https://github.com/localstack/sample-athena-glue-s3-data-lake-query.git
+git clone https://github.com/localstack-samples/sample-athena-glue-s3-data-lake-query.git
 ```
 
 Then, navigate to the project directory:
