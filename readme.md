@@ -33,6 +33,7 @@ The following diagram shows the architecture that this sample application builds
 
 ## Prerequisites
 
+- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a `LOCALSTACK_AUTH_TOKEN` to activate LocalStack.
 - [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/)
 - [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`awslocal` wrapper](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal)
 - [`make`](https://www.gnu.org/software/make/) (**optional**, but recommended for running the sample application)
@@ -64,7 +65,7 @@ No additional installation steps are required as the sample uses CloudFormation 
 
 ## Deployment
 
-Start LocalStack Pro with the `LOCALSTACK_AUTH_TOKEN` pre-configured:
+Start LocalStack with the `LOCALSTACK_AUTH_TOKEN` pre-configured:
 
 ```shell
 localstack auth set-token <LOCALSTACK_AUTH_TOKEN>
