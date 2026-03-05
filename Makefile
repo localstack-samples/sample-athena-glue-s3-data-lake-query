@@ -46,6 +46,7 @@ test:		## Run the tests
 
 start:		## Start LocalStack
 	@echo "Starting LocalStack..."
+	@test -n "${LOCALSTACK_AUTH_TOKEN}" || (echo "LOCALSTACK_AUTH_TOKEN is not set. Find your token at https://app.localstack.cloud/workspace/auth-token"; exit 1)
 	@LOCALSTACK_AUTH_TOKEN=$(LOCALSTACK_AUTH_TOKEN) IMAGE_NAME=localstack/localstack-pro:latest-bigdata localstack start -d
 	@echo "LocalStack started successfully."
 
